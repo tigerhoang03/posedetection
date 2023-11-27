@@ -1,0 +1,6 @@
+argparse
+mediapipe
+numpy
+opencv-python
+Pillow
+
