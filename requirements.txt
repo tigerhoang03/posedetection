@@ -2,5 +2,5 @@ argparse
 mediapipe
 numpy
 opencv-python
-Pillow
+Pillow == 9.5.0
 
