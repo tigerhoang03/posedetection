@@ -8,7 +8,7 @@ if __name__ == '__main__':
                         help="Path to video source file", type=str)
     parser.add_argument('-e', "--exercise", required=False, default="predict",
                         help="Type of exercise in video source",
-                        type=str, choices=['predict','shoulder_extension','hand_to_shoulder','forward_reach','neutral'])
+                        type=str, choices=['predict','shoulder_extension','hand_to_shoulder','forward_reach','neutral', 'external_rotation'])
     args = parser.parse_args()
     video = args.video
     exercise = args.exercise

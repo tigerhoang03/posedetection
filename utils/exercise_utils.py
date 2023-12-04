@@ -1,6 +1,6 @@
 import sys
 
-from utils.pose_utils.pose import Pose, Shoulder_extension, Hand_to_shoulder, Forward_reach, Neutral
+from utils.pose_utils.pose import Pose, Shoulder_extension, Hand_to_shoulder, Forward_reach, Neutral, External_rotation
 from utils.video_reader_utils import VideoReader
 
 class Exercise():

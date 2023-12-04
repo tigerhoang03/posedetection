@@ -610,24 +610,75 @@ class Forward_reach(Pose):
             for item in self.DataFile:
                 file.write(item + '\n')
 
-class external_rotation(Pose):
+class External_rotation(Pose):
     def __init__(self, video_reader) -> None:
         super().__init__(video_reader)
         self.video_reader = video_reader
         self.is_valid = False  
 
-    def pose_algorithim(self):
-        "algorithim for external rotation"
+    def pose_algorithm(self):
+        """algorithim for external rotation"""
         if self.is_point_in_keypoints("right_shoulder") and \
             self.is_point_in_keypoints("right_elbow"):
                 self.ang1 = self.one_line_angle("right_elbow", "right_shoulder")
+                print(self.ang1, "shouler-elbow")
         else:
             print('error')
         
         if self.is_point_in_keypoints("right_elbow") and \
             self.is_point_in_keypoints("right_wrist"):
                 self.ang2 = self.one_line_angle("right_elbow", "right_wrist")
+                print(self.ang2, "elbow-wrist")
         
     
     def measure(self) -> None:
-        pass
+        if self.video_reader.is_opened() is False:
+            print("Error File Not Found.")
+        
+        progress_counter = 0
+        progress_bar_color = (255, 255, 255)
+        out = cv2.VideoWriter("external_rotation.avi", self.fourcc, self.video_fps, (self.width, self.height))
+        frame_counter = 0
+        while self.video_reader.is_opened():
+            image = self.video_reader.read_frame()
+            frame_counter = frame_counter + 1
+            
+            if image is None:
+                print("Ignoring empty camera frame.")
+                break
+            
+            # To improve performance, optionally mark the image as not writeable to
+            # pass by reference.
+            image.flags.writeable = False
+            image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+            results = pose.process(image)
+
+            # overlay
+            image.flags.writeable = True
+            image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+            image = self.draw.overlay(image)
+            image = self.draw.skeleton(image, results)
+            
+            # progress bar
+            image = cv2.rectangle(image, (0, self.height//8 - 10), (self.width//60 * progress_counter, self.height//8),
+                                        progress_bar_color, cv2.FILLED)
+            if results.pose_landmarks is not None:
+                self.key_points = self.get_keypoints(image, results)
+                self.pose_algorithm()
+                # image = self._draw(image)
+
+                self.DataFile.append(str(frame_counter)+ "," + str(self.ang1))
+                if(self.is_valid==False):
+                    image = self.draw.pose_text(image, "Angle: " + str(self.ang1))
+                    
+                else:
+                    image = self.draw.pose_text(image, "Test Passed" )
+
+            out.write(image)
+            cv2.imshow('External_rotation', image)
+            if cv2.waitKey(5) & 0xFF == 27:
+                break
+        self.video_reader.release()
+        with open('External_rotation.csv','w',newline='') as file:
+            for item in self.DataFile:
+                file.write(item + '\n')
