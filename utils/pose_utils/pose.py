@@ -610,3 +610,24 @@ class Forward_reach(Pose):
             for item in self.DataFile:
                 file.write(item + '\n')
 
+class external_rotation(Pose):
+    def __init__(self, video_reader) -> None:
+        super().__init__(video_reader)
+        self.video_reader = video_reader
+        self.is_valid = False  
+
+    def pose_algorithim(self):
+        "algorithim for external rotation"
+        if self.is_point_in_keypoints("right_shoulder") and \
+            self.is_point_in_keypoints("right_elbow"):
+                self.ang1 = self.one_line_angle("right_elbow", "right_shoulder")
+        else:
+            print('error')
+        
+        if self.is_point_in_keypoints("right_elbow") and \
+            self.is_point_in_keypoints("right_wrist"):
+                self.ang2 = self.one_line_angle("right_elbow", "right_wrist")
+        
+    
+    def measure(self) -> None:
+        pass
